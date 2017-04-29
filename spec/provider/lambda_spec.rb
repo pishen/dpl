@@ -143,6 +143,34 @@ describe DPL::Provider::Lambda do
       end
     end
   end
+  
+  describe "#function_exists?" do
+    function_name = "test-function"
+    
+    get_function_configuration_response = {
+      function_name: function_name
+    }
+    
+    context "with function exists" do
+      before do
+        provider.lambda.stub_responses(:get_function_configuration, get_function_configuration_response)
+      end
+      
+      example do
+        expect(provider.function_exists?(function_name)).to eq(true)
+      end
+    end
+    
+    context "with function not exist" do
+      before do
+        provider.lambda.stub_responses(:get_function_configuration, 'ResourceNotFoundException')
+      end
+      
+      example do
+        expect(provider.function_exists?(function_name)).to eq(false)
+      end
+    end
+  end
 
   describe "#handler" do
     context "without a module name" do
@@ -314,6 +342,52 @@ describe DPL::Provider::Lambda do
 
     example do
       provider.create_zip(dest, src, files)
+    end
+  end
+  
+  describe '#vpc_config' do
+    single_subnet_id = 'subnet-xxxxxxxx'
+    subnet_ids = ['subnet-xxxxxxxx', 'subnet-yyyyyyyy']
+    single_security_group = 'sg-xxxxxxxx'
+    security_groups = ['sg-xxxxxxxx', 'sg-yyyyyyyy']
+    
+    context 'without subnet and security group' do
+      before do
+        expect(provider.options).to receive(:[]).with(:subnet_ids).and_return(nil)
+        expect(provider.options).to receive(:[]).with(:security_group_ids).and_return(nil)
+      end
+      
+      example do
+        expect(provider.vpc_config).to eq({})
+      end
+    end
+    
+    context 'with single subnet and security group' do
+      before do
+        expect(provider.options).to receive(:[]).with(:subnet_ids).and_return(single_subnet_id)
+        expect(provider.options).to receive(:[]).with(:security_group_ids).and_return(single_security_group)
+      end
+      
+      example do
+        expect(provider.vpc_config).to eq({
+          subnet_ids: [single_subnet_id],
+          security_group_ids: [single_security_group]
+        })
+      end
+    end
+    
+    context 'with multiple subnets and security groups' do
+      before do
+        expect(provider.options).to receive(:[]).with(:subnet_ids).and_return(subnet_ids)
+        expect(provider.options).to receive(:[]).with(:security_group_ids).and_return(security_groups)
+      end
+      
+      example do
+        expect(provider.vpc_config).to eq({
+          subnet_ids: subnet_ids,
+          security_group_ids: security_groups
+        })
+      end
     end
   end
 
