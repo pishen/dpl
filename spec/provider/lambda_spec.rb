@@ -353,8 +353,8 @@ describe DPL::Provider::Lambda do
     
     context 'without subnet and security group' do
       before do
-        expect(provider.options).to receive(:[]).with(:subnet_ids).and_return(nil)
-        expect(provider.options).to receive(:[]).with(:security_group_ids).and_return(nil)
+        expect(provider.options).to receive(:[]).with(:subnet_ids).at_least(:once).and_return(nil)
+        expect(provider.options).to receive(:[]).with(:security_group_ids).at_least(:once).and_return(nil)
       end
       
       example do
@@ -364,8 +364,8 @@ describe DPL::Provider::Lambda do
     
     context 'with single subnet and security group' do
       before do
-        expect(provider.options).to receive(:[]).with(:subnet_ids).and_return(single_subnet_id)
-        expect(provider.options).to receive(:[]).with(:security_group_ids).and_return(single_security_group)
+        expect(provider.options).to receive(:[]).with(:subnet_ids).at_least(:once).and_return(single_subnet_id)
+        expect(provider.options).to receive(:[]).with(:security_group_ids).at_least(:once).and_return(single_security_group)
       end
       
       example do
@@ -378,8 +378,8 @@ describe DPL::Provider::Lambda do
     
     context 'with multiple subnets and security groups' do
       before do
-        expect(provider.options).to receive(:[]).with(:subnet_ids).and_return(subnet_ids)
-        expect(provider.options).to receive(:[]).with(:security_group_ids).and_return(security_groups)
+        expect(provider.options).to receive(:[]).with(:subnet_ids).at_least(:once).and_return(subnet_ids)
+        expect(provider.options).to receive(:[]).with(:security_group_ids).at_least(:once).and_return(security_groups)
       end
       
       example do
